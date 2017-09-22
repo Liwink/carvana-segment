@@ -4,7 +4,7 @@ from dataset.mask import *
 
 #CARVANA_DIR = '/root/share/data/kaggle-carvana-cars-2017'
 # CARVANA_DIR = '/media/ssd/data/kaggle-carvana-cars-2017'
-CARVANA_DIR = '/Users/lcp/projects/carvana'
+CARVANA_DIR = CARVANA_DIR
 CARVANA_NUM_VIEWS = 16
 CARVANA_HEIGHT = 1280
 CARVANA_WIDTH  = 1918
@@ -78,7 +78,6 @@ class KgCarDataset(Dataset):
         folder = self.folder
         id     = name[:-3]
         view   = int(name[-2:])-1
-
         img_file = CARVANA_DIR + '/images/%s/%s.jpg'%(folder,name)
         img   = cv2.imread(img_file)
         image = img.astype(np.float32)/255
@@ -90,7 +89,7 @@ class KgCarDataset(Dataset):
 
         #mask_file = CARVANA_DIR + '/annotations/%s/%s_mask.png'%(folder,name)
         if 'test' in folder: mask_file = CARVANA_DIR + '/priors/%s/%s.png'%(folder,name)
-        else:                mask_file = CARVANA_DIR + '/annotations/%s/%s_mask.png'%(folder,name)
+        else:                mask_file = CARVANA_DIR + '/annotations/%s/%s_mask.jpg'%(folder,name)
 
         mask = cv2.imread(mask_file,cv2.IMREAD_GRAYSCALE)
         label = mask.astype(np.float32)/255

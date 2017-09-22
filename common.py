@@ -60,6 +60,9 @@ import sklearn.metrics
 
 from skimage import io
 from sklearn.metrics import fbeta_score
+
+from config import *
+
 '''
 updating pytorch
     https://discuss.pytorch.org/t/updating-pytorch/309
@@ -84,7 +87,7 @@ if 1:
     random.seed(SEED)
     np.random.seed(SEED)
     torch.manual_seed(SEED)
-    # torch.cuda.manual_seed(SEED)
+    torch.cuda.manual_seed(SEED)
     print ('\tset random seed')
     print ('\t\tSEED=%d'%SEED)
 

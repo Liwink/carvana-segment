@@ -31,7 +31,9 @@ def criterion(logits, labels, is_weight=True):
     elif H == 256:  kernel_size =21
     elif H == 512:  kernel_size =21
     elif H == 1024: kernel_size =41 #41
-    else: raise ValueError('exit at criterion()')
+    else:
+        print(labels.size())
+        raise ValueError('exit at criterion()')
 
     a   = F.avg_pool2d(labels,kernel_size=kernel_size,padding=kernel_size//2,stride=1)
     ind = a.ge(0.01) * a.le(0.99)
@@ -209,10 +211,8 @@ def evaluate(net, test_loader):
 # ------------------------------------------------------------------------------------
 def run_train():
 
-    # out_dir  = '/root/share/project/kaggle-carvana-cars/results/single/UNet1024-01c'
-    out_dir = '/Users/lcp/projects/carvana/results/single/UNet1024-01c'
+    out_dir = TRAIN_OUT_DIR
     initial_checkpoint = None
-        #'/root/share/project/kaggle-carvana-cars/results/single/UNet128-00-xxx/checkpoint/006.pth'
 
 
     #logging, etc --------------------
@@ -457,8 +457,7 @@ def run_train():
 # ------------------------------------------------------------------------------------
 
 def run_valid():
-
-    out_dir = '/root/share/project/kaggle-carvana-cars/results/single/UNet1024-peduo-label-01c'
+    out_dir = VALID_OUT_DIR
     #out_dir    = '/root/share/project/kaggle-carvana-cars/results/single/UNet512-peduo-label-00'
     #out_dir    = '/root/share/project/kaggle-carvana-cars/results/single/UNet512-peduo-label-00c'
     #out_dir    = '/root/share/project/kaggle-carvana-cars/results/__old_4__/UNet1024-shallow-01b'
