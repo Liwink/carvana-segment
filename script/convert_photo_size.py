@@ -7,17 +7,23 @@ from PIL import Image
 
 SOURCE_DIR = '../../images/train/'
 TARGET_DIR = '../../images/train128x128/train/'
-SIZE = 128, 128
+# SOURCE_DIR = '../../images/train_masks/'
+# TARGET_DIR = '../../annotations/train128x128/train/'
+SIZE = 192, 128
 
 
 def convert(filename):
     im = Image.open(SOURCE_DIR + filename)
     im.thumbnail(SIZE, Image.ANTIALIAS)
-    im.save(TARGET_DIR + filename, 'JPEG')
+    # im.save(TARGET_DIR + filename, 'JPEG')
+    if filename.endswith('gif'):
+        filename = filename[:-3] + 'jpg'
+        im = im.convert('RGB')
+    im.save(TARGET_DIR + filename)
 
 
 def photo_filenames():
-    return [i for i in os.listdir(SOURCE_DIR) if i.endswith('.jpg')]
+    return [i for i in os.listdir(SOURCE_DIR) if i.endswith('.jpg') or i.endswith('.gif')]
 
 
 def main():
