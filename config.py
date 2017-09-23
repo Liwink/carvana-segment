@@ -6,6 +6,7 @@ if platform == 'darwin':
     CARVANA_DIR = '/Users/lcp/projects/carvana'
     USING_CUDA = False
 elif platform == 'linux' or platform == 'linux2':
+    USING_CUDA = True
     raise Exception('Clarify the Config of Linux.')
 else:
     raise Exception('Clarify the Config.')

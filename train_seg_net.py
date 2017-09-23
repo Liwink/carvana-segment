@@ -38,7 +38,10 @@ def criterion(logits, labels, is_weight=True):
     a   = F.avg_pool2d(labels,kernel_size=kernel_size,padding=kernel_size//2,stride=1)
     ind = a.ge(0.01) * a.le(0.99)
     ind = ind.float()
-    weights  = Variable(torch.tensor.torch.ones(a.size())).cuda()
+    if USING_CUDA:
+        weights  = Variable(torch.tensor.torch.ones(a.size())).cuda()
+    else:
+        weights = Variable(torch.tensor.torch.ones(a.size()))
 
     if is_weight:
         w0 = weights.sum()
@@ -132,7 +135,10 @@ def predict8_in_blocks(net, test_loader, block_size=CSV_BLOCK_SIZE, log=None, sa
 
 
             # forward
-            images = Variable(images,volatile=True).cuda()
+            if USING_CUDA:
+                images = Variable(images,volatile=True).cuda()
+            else:
+                images = Variable(images, volatile=True)
             logits = net(images)
             probs  = F.sigmoid(logits)
 
@@ -184,8 +190,12 @@ def evaluate(net, test_loader):
     test_loss = 0
     test_num  = 0
     for it, (images, labels, indices) in enumerate(test_loader, 0):
-        images = Variable(images.cuda(),volatile=True)
-        labels = Variable(labels.cuda(),volatile=True)
+        if USING_CUDA:
+            images = Variable(images.cuda(),volatile=True)
+            labels = Variable(labels.cuda(),volatile=True)
+        else:
+            images = Variable(images, volatile=True)
+            labels = Variable(labels, volatile=True)
 
         # forward
         logits = net(images)
@@ -266,6 +276,7 @@ def run_train():
                                    'train128x128', ## 1024x1024 ##
                                    #'test_100064', 'test1024x1024',
                                 transform = [ lambda x,y:train_augment(x,y), ], mode='train')
+    pin_memory = True if USING_CUDA else False
     train_loader  = DataLoader(
                         train_dataset,
                         #sampler = RandomSampler(train_dataset),
@@ -273,7 +284,7 @@ def run_train():
                         batch_size  = batch_size,
                         drop_last   = True,
                         num_workers = 8,
-                        pin_memory  = True)
+                        pin_memory  = pin_memory)
     ##check_dataset(train_dataset, train_loader), exit(0)
 
     valid_dataset = KgCarDataset('valid_v0_768', 'train128x128', transform=[], mode='train')
@@ -283,7 +294,7 @@ def run_train():
                         batch_size  = batch_size,
                         drop_last   = False,
                         num_workers = 6,
-                        pin_memory  = True)
+                        pin_memory  = pin_memory)
 
 
     log.write('\ttrain_dataset.split = %s\n'%train_dataset.split)
@@ -297,7 +308,8 @@ def run_train():
     log.write('** net setting **\n')
 
     net = Net(in_shape=(3, 128, 128))
-    net.cuda()
+    if USING_CUDA:
+        net.cuda()
 
     log.write('%s\n\n'%(type(net)))
     log.write('%s\n\n'%(str(net)))
@@ -393,8 +405,12 @@ def run_train():
 
         net.train()
         for it, (images, labels, indices) in enumerate(train_loader, 0):
-            images  = Variable(images).cuda()
-            labels  = Variable(labels).cuda()
+            if USING_CUDA:
+                images  = Variable(images).cuda()
+                labels  = Variable(labels).cuda()
+            else:
+                images = Variable(images)
+                labels = Variable(labels)
 
             #forward
             logits = net(images)
@@ -505,7 +521,8 @@ def run_valid():
     ## net ----------------------------------------
     net = Net(in_shape=(3, CARVANA_HEIGHT, CARVANA_WIDTH))
     net.load_state_dict(torch.load(model_file))
-    net.cuda()
+    if USING_CUDA:
+        net.cuda()
 
     num_valid = len(valid_dataset)
     names = valid_dataset.names
@@ -521,8 +538,12 @@ def run_valid():
     start=0
     end  =0
     for it, (images, labels, indices) in enumerate(valid_loader, 0):
-        images  = Variable(images,volatile=True).cuda().half()
-        labels  = Variable(labels).cuda().half()
+        if USING_CUDA:
+            images = Variable(images,volatile=True).cuda().half()
+            labels = Variable(labels).cuda().half()
+        else:
+            images = Variable(images, volatile=True).half()
+            labels = Variable(labels).half()
         batch_size = len(indices)
 
         #forward
@@ -635,7 +656,8 @@ def run_submit1():
     ## net ----------------------------------------
     net = Net(in_shape=(3, CARVANA_HEIGHT, CARVANA_WIDTH))
     net.load_state_dict(torch.load(model_file))
-    net.cuda()
+    if USING_CUDA:
+        net.cuda()
 
 
     if is_merge_bn: merge_bn_in_net(net)

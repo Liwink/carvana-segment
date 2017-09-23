@@ -87,7 +87,8 @@ if 1:
     random.seed(SEED)
     np.random.seed(SEED)
     torch.manual_seed(SEED)
-    torch.cuda.manual_seed(SEED)
+    if USING_CUDA:
+        torch.cuda.manual_seed(SEED)
     print ('\tset random seed')
     print ('\t\tSEED=%d'%SEED)
 
