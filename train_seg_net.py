@@ -7,8 +7,9 @@ from net.segmentation.loss import *
 from net.segmentation.blocks import *
 
 #from net.segmentation.my_unet_baseline import UNet512 as Net
-#from net.segmentation.my_unet_baseline import UNet1024 as Net
-from net.segmentation.my_unet_baseline import UNet128 as Net
+# FIXME: 1024
+from net.segmentation.my_unet_baseline import UNet1024 as Net
+# from net.segmentation.my_unet_baseline import UNet128 as Net
 
 
 ## ----------------------------------------------------------------------------------
@@ -17,7 +18,7 @@ from net.segmentation.my_unet_baseline import UNet128 as Net
 
 CSV_BLOCK_SIZE = 16000
 
-
+FOLDER = 'train128x128'
 
 
 ## experiment setting here ----------------------------------------------------
@@ -31,6 +32,7 @@ def criterion(logits, labels, is_weight=True):
     elif H == 256:  kernel_size =21
     elif H == 512:  kernel_size =21
     elif H == 1024: kernel_size =41 #41
+    elif H == 1280: kernel_size = 41  # TODO: what's the proper kernel_size
     else:
         print(labels.size())
         raise ValueError('exit at criterion()')
@@ -268,12 +270,14 @@ def run_train():
 
 
     log.write('** dataset setting **\n')
-    batch_size   =  16
+    batch_size = 3
+    # FIXME: proper batch_size
+    # batch_size   =  16
     num_grad_acc =  32//batch_size
 
     train_dataset = KgCarDataset(  'train_v0_4320',
                                    #'train_5088',
-                                   'train128x128', ## 1024x1024 ##
+                                   FOLDER, ## 1024x1024 ##
                                    #'test_100064', 'test1024x1024',
                                 transform = [ lambda x,y:train_augment(x,y), ], mode='train')
     pin_memory = True if USING_CUDA else False
@@ -287,7 +291,7 @@ def run_train():
                         pin_memory  = pin_memory)
     ##check_dataset(train_dataset, train_loader), exit(0)
 
-    valid_dataset = KgCarDataset('valid_v0_768', 'train128x128', transform=[], mode='train')
+    valid_dataset = KgCarDataset('valid_v0_768', FOLDER, transform=[], mode='train')
     valid_loader  = DataLoader(
                         valid_dataset,
                         sampler = SequentialSampler(valid_dataset),
