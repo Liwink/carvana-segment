@@ -18,7 +18,9 @@ from net.segmentation.my_unet_baseline import UNet1024 as Net
 
 CSV_BLOCK_SIZE = 16000
 
-FOLDER = 'train128x128'
+# FIXME
+# FOLDER = 'train128x128'
+FOLDER = 'origin'
 
 
 ## experiment setting here ----------------------------------------------------
